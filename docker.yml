@@ -1,0 +1,27 @@
+---
+# This playbook deploys the whole application stack in this site.
+#
+ - name: apply common configuration to all nodes
+   hosts: pis
+   sudo: yes
+   tasks:
+           #           - name: updates cache only if the last update was more than an hour agoupgrade
+           #             apt:
+           #                     update_cache: yes
+           #                     cache_valid_time: 3600
+           
+           #           - name: Upgrade all packages to latest version
+           #             apt:
+           #                     name: "*"
+           #                     state: latest
+
+           - name: Check if Docker is installed
+             apt:
+                     name: docker-ce
+                     state: present
+             register: command_result 
+             ignore_errors: yes
+
+           - name: Install Docker direct from source
+             shell: curl -sSL https://get.docker.com | sh
+             when: command_result is failed
