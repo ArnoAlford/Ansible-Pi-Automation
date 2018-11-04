@@ -1,5 +1,5 @@
 ---
-# This playbook deploys the whole application stack in this site.
+# This playbook deploys docker to all my pis
 #
  - name: apply common configuration to all nodes
    hosts: pis
@@ -25,3 +25,17 @@
            - name: Install Docker direct from source
              shell: curl -sSL https://get.docker.com | sh
              when: command_result is failed
+
+ - name: creates the Docker manager
+   hosts: docker-manager
+   sudo: yes
+   tasks:
+           - name: Create Docker Manager
+             shell: docker swarm init --advertise-addr={{ ansible_default_ipv4.address }}
+             ignore_errors: yes
+
+           - name: Check Docker manager token
+             command: echo "docker swarm join-token -q manager"
+             register: docker_token
+           - debug: msg={{ docker_token.stdout }}
+
